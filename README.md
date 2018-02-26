@@ -1,3 +1,0 @@
-# CO on Metal
-
-Blah
