@@ -1,3 +1,3 @@
-# CO adsorption on Metal Surfaces
+# CO on Metal
 
 Blah
