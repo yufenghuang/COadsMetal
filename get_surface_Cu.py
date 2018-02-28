@@ -5,6 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from function import *
 
+
+r = 10.0
+
+
 #######################################################################################
 #                                                                                     #
 #                       Step I: Generate array for all atom groups from xyz file      #
@@ -62,7 +66,7 @@ m_cycle=int(np.floor(Cu_T.shape[0]/100))
 sur_NN=[]
 for i in range(m_cycle):    
     b=Cu_T[i*100:(i+1)*100]
-    NN_list=get_Neighbor(b,Cu_array,3.3)
+    NN_list=get_Neighbor(b,Cu_array,3.0)
     for p in range(len(NN_list)):
         if NN_list[p]!=13:
            lsst=list(b[p])
@@ -109,7 +113,7 @@ surface_out.close()
 #                     Step IV: Remove the atoms around the boundary                   #
 #                                                                                     #
 #######################################################################################
-infile=open('surface_finel.xyz','r')
+infile=open('surface_final.xyz','r')
 outfile=open('surface_Cu.xyz','w')
 Num_a=int(infile.readline())
 line=infile.readline()
