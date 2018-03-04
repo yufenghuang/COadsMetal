@@ -46,6 +46,20 @@ def getCoord(poscar):
             R[i] = np.array(p.readline().split()[:3],dtype=float)
     return nAtoms, R.dot(lattice)-[10,10,10]
 
+def loadxyz(xyzFile):
+    with open(xyzFile, 'r') as file:
+        nAtoms = int(file.readline())
+        R = np.zeros((nAtoms, 3))
+        atoms = np.ones(nAtoms,dtype=int)
+        file.readline()
+        for i in range(nAtoms):
+            line = file.readline().split()
+            if line[0] == "C":
+                atoms[i] = 0
+            R[i] = np.array(line[1:4], dtype=float)
+    return atoms, R
+        
+    
 def getE(poscar):
     with open(poscar,'r') as p:
         E = np.array(p.readline().split(),dtype=float)

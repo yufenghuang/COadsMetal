@@ -14,6 +14,7 @@ nnParams, featParams = pyu.initParams()
 nAd, AdFeat, AdEngy = pyu.getAd("adsorbed", featParams)
 nDe, DeFeat = pyu.getDe("desorbed", featParams)
 
+'''
 pyf.trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams,save=True)
 
 #pyf.trainE(AdFeat, AdEngy, featParams, nnParams,save=True)
@@ -21,3 +22,11 @@ pyf.trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams,save=True)
 pyf.getE(AdFeat, featParams, nnParams)
 
 pyf.getAd(AdFeat, featParams, nnParams)
+
+'''
+
+atoms, R = pyu.loadxyz("CuC_NP.xyz")
+
+R_Cu = R[atoms==1]
+R_C = R[atoms==0]
+
