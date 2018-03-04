@@ -25,7 +25,7 @@ def getE(tf_feat, nFeat, nnParams):
         
     return L3
 
-def getAd(tf_feat, nFeat, nnParams, tf_labels):
+def getAd(tf_feat, nFeat, nnParams):
     with tf.variable_scope("adsorption", reuse=tf.AUTO_REUSE):
         mu = tf.get_variable("mu", shape=[1],initializer=tf.constant_initializer(-0.3))
     L3 = getE(tf_feat, nFeat, nnParams)

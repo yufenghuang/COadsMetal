@@ -57,7 +57,7 @@ def trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams, save=False, load=False
     tf_LR = tf.placeholder(tf.float32)
     
     L3 = tff.getE(tf_feat, featParams['nFeat'], nnParams)
-    L4 = tff.getAd(tf_feat, featParams['nFeat'], nnParams, tf_labels)
+    L4 = tff.getAd(tf_feat, featParams['nFeat'], nnParams)
     
     engyLoss = tf.reduce_mean((L3 - tf_engy)**2)
     logitLoss = tf.reduce_mean((L4 - tf_labels)**2)
@@ -160,3 +160,33 @@ def trainE(AdFeat, AdEngy, featParams, nnParams, save=False, load=False):
             np.savez("nnParams", **nnParams)
             savePath = saver.save(sess,"./model.ckpt")
             print("Model saved:", savePath)
+            
+def getE(feat, featParams, nnParams):
+    tf_feat = tf.placeholder(tf.float32, (None,featParams['nFeat']))
+    L3 = tff.getE(tf_feat, featParams['nFeat'], nnParams)
+    
+    with tf.Session() as sess:
+        saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
+        sess.run(tf.global_variables_initializer())
+        saver.restore(sess, "./model.ckpt")
+        
+        feedDict = {tf_feat: scaleFeat(featParams, feat)}
+        
+        engy = sess.run(L3, feed_dict=feedDict)
+        
+    return engy
+
+def getAd(feat, featParams, nnParams):
+    tf_feat = tf.placeholder(tf.float32, (None,featParams['nFeat']))
+    L4 = tff.getAd(tf_feat, featParams['nFeat'], nnParams)
+    
+    with tf.Session() as sess:
+        saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
+        sess.run(tf.global_variables_initializer())
+        saver.restore(sess, "./model.ckpt")
+        
+        feedDict = {tf_feat: scaleFeat(featParams, feat)}
+        
+        label = np.array(sess.run(L4, feed_dict=feedDict) > 0.5, dtype=int)
+        
+    return label

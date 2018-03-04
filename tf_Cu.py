@@ -14,6 +14,10 @@ nnParams, featParams = pyu.initParams()
 nAd, AdFeat, AdEngy = pyu.getAd("adsorbed", featParams)
 nDe, DeFeat = pyu.getDe("desorbed", featParams)
 
-#pyf.trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams,save=True)
+pyf.trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams,save=True)
 
-pyf.trainE(AdFeat, AdEngy, featParams, nnParams,save=True)
+#pyf.trainE(AdFeat, AdEngy, featParams, nnParams,save=True)
+
+pyf.getE(AdFeat, featParams, nnParams)
+
+pyf.getAd(AdFeat, featParams, nnParams)
