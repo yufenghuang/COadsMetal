@@ -28,7 +28,6 @@ def initParams():
     
     return nnParams, featParams
 
-
 def getCoord(poscar):
     with open(poscar,'r') as p:
         nAtoms=0
@@ -46,20 +45,79 @@ def getCoord(poscar):
             R[i] = np.array(p.readline().split()[:3],dtype=float)
     return nAtoms, R.dot(lattice)-[10,10,10]
 
-def loadxyz(xyzFile):
+def loadMCxyz(xyzFile):
     with open(xyzFile, 'r') as file:
         nAtoms = int(file.readline())
         R = np.zeros((nAtoms, 3))
-        atoms = np.ones(nAtoms,dtype=int)
+        isMetal = np.ones(nAtoms,dtype=int)
         file.readline()
         for i in range(nAtoms):
             line = file.readline().split()
             if line[0] == "C":
-                atoms[i] = 0
+                isMetal[i] = 0
             R[i] = np.array(line[1:4], dtype=float)
-    return atoms, R
-        
+    return isMetal, R
+
+def removeC(R_M, R_C, Rc, chunkSize=1000):
+    idxM = np.arange(len(R_M),dtype=int)
     
+    nChunk = np.ceil(len(R_M)/chunkSize).astype(int)
+    Rsplit = np.array_split(R_M, nChunk)
+    idxSpl = np.array_split(idxM, nChunk)
+    
+    MnearC = np.zeros(len(R_M),dtype=bool)
+        
+    for i in range(nChunk):
+        isMnearC = np.amin(np.sum(((Rsplit[i])[:,np.newaxis,:] - R_C)**2,axis=2),axis=1)<Rc**2
+        MnearC[(idxSpl[i])[isMnearC]] = True
+        print("Removing metal atoms near the CN, chunk", i+1, "of ", nChunk)
+    
+    return R_M[~MnearC]
+
+def getSurfNN(R_M, R_M_all, Rnb = 3.0, chunkSize=100):
+    nChunk = np.ceil(len(R_M)/chunkSize).astype(int)
+    
+    idxM = np.arange(len(R_M),dtype=int)
+    Rsplit = np.array_split(R_M, nChunk)
+    idxSpl = np.array_split(idxM, nChunk)
+    isSurf = np.zeros(len(R_M),dtype=bool)
+    
+    for i in range(nChunk):
+        numNb = np.sum(np.sum(((Rsplit[i])[:,np.newaxis,:] - R_M_all)**2,axis=2) < Rnb**2,axis=1)
+        isSurf[(idxSpl[i])[numNb < 13]] = True
+        print("Searching for surface sites using nearest neighbors, chunk", i+1, "of ", nChunk)
+    
+    return R_M[isSurf]
+
+def getSurfVector(R_surfNN, R_M_all, Rnb = 15.0, angleCutoff = 30):
+    idxSurf = np.zeros(len(R_surfNN), dtype=bool)
+    
+    for i in range(len(R_surfNN)):
+        d = np.sqrt(np.sum((R_surfNN[i] - R_M_all)**2,axis=1))
+        R_M_nb = R_M_all[(d<Rnb) & (d!=0)] - R_surfNN[i]
+        R_M_nb = R_M_nb/(np.sqrt(np.sum(R_M_nb**2,axis=1)))[:,np.newaxis]    
+        
+        surfVec = -np.sum(R_M_nb, axis=0)
+        surfVec = surfVec / np.linalg.norm(surfVec)
+        
+        angles = np.arccos(np.sum(surfVec * R_M_nb,axis=1))*180/np.pi
+        
+        idxSurf[i] = (np.sum(angles < angleCutoff) == 0)
+        print("Search for surface sites using surface vectors, site", i+1, "of", len(R_surfNN))
+
+    return R_surfNN[idxSurf]
+
+def saveXYZ(R_list, Element_list, fileName):
+    nAtoms = 0
+    for R in R_list:
+        nAtoms += len(R)
+    with open(fileName, 'w') as file:
+        file.write(str(nAtoms) + "\n")
+        file.write("\n")
+        for R, element in zip(R_list, Element_list):
+            for i in range(len(R)):
+                file.write(element + " " + str(R[i,0]) + " " + str(R[i,1]) + " " + str(R[i,2]) + "\n")
+
 def getE(poscar):
     with open(poscar,'r') as p:
         E = np.array(p.readline().split(),dtype=float)
