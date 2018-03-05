@@ -45,6 +45,9 @@ def getCoord(poscar):
             R[i] = np.array(p.readline().split()[:3],dtype=float)
     return nAtoms, R.dot(lattice)-[10,10,10]
 
+def getNN(Rin, Rall, Rcut):
+    return Rall[np.sum((Rin - Rall)**2,axis=1) < Rcut**2]
+
 def loadMCxyz(xyzFile):
     with open(xyzFile, 'r') as file:
         nAtoms = int(file.readline())

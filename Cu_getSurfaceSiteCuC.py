@@ -7,25 +7,8 @@ Created on Sun Mar  4 11:38:06 2018
 """
 
 import py_util as pyu
-import py_func as pyf
-
-import numpy as np
 
 nnParams, featParams = pyu.initParams()
-
-nAd, AdFeat, AdEngy = pyu.getAd("adsorbed", featParams)
-nDe, DeFeat = pyu.getDe("desorbed", featParams)
-
-'''
-pyf.trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams,save=True)
-
-#pyf.trainE(AdFeat, AdEngy, featParams, nnParams,save=True)
-
-pyf.getE(AdFeat, featParams, nnParams)
-
-pyf.getAd(AdFeat, featParams, nnParams)
-
-'''
 
 #atoms, R = pyu.loadMCxyz("CuC_NP.xyz")
 #
@@ -33,10 +16,9 @@ pyf.getAd(AdFeat, featParams, nnParams)
 #R_C = R[atoms==0]
 
 atomList, atomType, R = pyu.loadXYZ("CuC_NP.xyz")
-aList = np.array(atomList, dtype=int)
 
-R_Cu = R[aList == atomType.index('Cu')]
-R_C = R[aList == atomType.index('C')]
+R_Cu = R[atomList == atomType.index('Cu')]
+R_C = R[atomList == atomType.index('C')]
 
 Cu_T = pyu.removeC(R_Cu, R_C, Rc=8.0, chunkSize=1000)
 
