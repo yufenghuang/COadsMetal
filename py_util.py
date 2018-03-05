@@ -58,6 +58,23 @@ def loadMCxyz(xyzFile):
             R[i] = np.array(line[1:4], dtype=float)
     return isMetal, R
 
+def loadXYZ(xyzFile):
+    with open(xyzFile, 'r') as file:
+        nAtoms = int(file.readline())
+        R = np.zeros((nAtoms, 3))
+        atomList = np.zeros(nAtoms, dtype=int)
+        atomType = []
+        
+        file.readline()
+        
+        for i in range(nAtoms):
+            line = file.readline().split()
+            if line[0] not in atomType:
+                atomType.append(line[0])
+            atomList[i] = atomType.index(line[0])
+            R[i] = np.array(line[1:4], dtype=float)
+    return atomList, atomType, R
+
 def removeC(R_M, R_C, Rc, chunkSize=1000):
     idxM = np.arange(len(R_M),dtype=int)
     

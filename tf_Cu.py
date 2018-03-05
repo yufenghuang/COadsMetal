@@ -27,10 +27,16 @@ pyf.getAd(AdFeat, featParams, nnParams)
 
 '''
 
-atoms, R = pyu.loadMCxyz("CuC_NP.xyz")
+#atoms, R = pyu.loadMCxyz("CuC_NP.xyz")
+#
+#R_Cu = R[atoms==1]
+#R_C = R[atoms==0]
 
-R_Cu = R[atoms==1]
-R_C = R[atoms==0]
+atomList, atomType, R = pyu.loadXYZ("CuC_NP.xyz")
+aList = np.array(atomList, dtype=int)
+
+R_Cu = R[aList == atomType.index('Cu')]
+R_C = R[aList == atomType.index('C')]
 
 Cu_T = pyu.removeC(R_Cu, R_C, Rc=8.0, chunkSize=1000)
 
