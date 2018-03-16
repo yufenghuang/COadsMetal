@@ -39,7 +39,8 @@ def getCoord(poscar):
         lattice[2,:] = np.array(p.readline().split(),dtype=float)
         p.readline()
         nAtoms = int(p.readline())
-        p.readline()
+        if (p.readline().strip(" "))[0].upper() == "S":
+            p.readline()
         R = np.zeros((nAtoms,3))
         for i in range(nAtoms):
             R[i] = np.array(p.readline().split()[:3],dtype=float)
