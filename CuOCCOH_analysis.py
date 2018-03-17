@@ -13,6 +13,10 @@ nnParams, featParams = pyu.initParams()
 import os
 import numpy as np
 
+import matplotlib.pyplot as plt
+
+from mpl_toolkits.mplot3d import Axes3D
+
 def getE(poscar):
     with open(poscar,'r') as p:
         E = np.array(p.readline().split(),dtype=float)
@@ -46,4 +50,29 @@ for file in os.listdir(AdDir):
 #    AdFeat[iAd] = pyu.getFeat(numA, coord, featParams['n2b'], featParams['n3b'])
     iAd += 1
 
-#return nAd, AdFeat, AdEngy
+
+# remove outliner
+    
+outliner = AdEngy[:,2] < -10
+AdEngy = AdEngy[~outliner]
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot_trisurf(AdEngy[:,0], AdEngy[:,1], AdEngy[:,2], linewidth=1., antialiased=True)
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot_trisurf(AdEngy[:,0], AdEngy[:,1], AdEngy[:,2]-AdEngy[:,0]-AdEngy[:,1], linewidth=1., antialiased=True)
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.scatter(AdEngy[:,0], AdEngy[:,1], AdEngy[:,2])
+
+
+
+
+
+
+
+
+
