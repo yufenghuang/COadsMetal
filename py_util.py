@@ -165,6 +165,21 @@ def getFeat(nAtoms, coord,n2b,n3b):
     yD = np.sum(getCos(Rl/4-1,n3b)[:,np.newaxis,:,np.newaxis] * yD[:,:,np.newaxis,:],axis=0)
     yD = np.sum(getCos(Rl/4-1,n3b)[:,np.newaxis,:,np.newaxis] * yD[:,:,np.newaxis,:],axis=0)
     return np.concatenate([yR, yD.reshape(-1)])
+
+def getFeatPOSCAR(poscarDir, featParams):
+
+    nPOSCAR = 0
+    for file in os.listdir(poscarDir):
+        nPOSCAR+=1
+
+    featPOSCAR = np.zeros((nPOSCAR, featParams['nFeat']))
+
+    for i,file in enumerate(os.listdir(poscarDir)):
+        numA, coord = getCoord(poscarDir+"/"+file)
+        featPOSCAR[i] = getFeat(numA, coord, featParams['n2b'], featParams['n3b'])
+
+    return nPOSCAR, featPOSCAR
+
             
 def getAd(AdDir, featParams):
     

@@ -17,8 +17,8 @@ nDe, DeFeat = pyu.getDe("desorbed", featParams)
 
 #pyf.trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams,save=True)
 
-nnParams = pyu.loadNN("nnParams.npz")
-featParams = pyu.loadFeat("featParams.npz")
+nnParams = pyu.loadNN("log/nnParams.npz")
+featParams = pyu.loadFeat("log/featParams.npz")
 E = pyf.getE(AdFeat, featParams, nnParams)
 #
 #pyf.getAd(AdFeat, featParams, nnParams)
