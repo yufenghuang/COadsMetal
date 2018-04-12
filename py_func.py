@@ -23,7 +23,7 @@ def getFeatAB(feat):
     featA = featScaler.transform(np.ones((1,nFeat))) - featB
     return featA, featB
 
-def trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams, save=False, load=False):        
+def trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams, save=False, load=False, logFile="log"):
     AdFeatTrain, AdFeatTest, AdEngyTrain, AdEngyTest = train_test_split(
             AdFeat, AdEngy, test_size=0.1)
     
@@ -52,7 +52,7 @@ def trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams, save=False, load=False
         sess.run(tf.global_variables_initializer())
         
         if load:
-            saver.restore(sess, "./log/model.ckpt")
+            saver.restore(sess, "./"+logFile+"/model.ckpt")
         else:
             featParams['featA'], featParams['featB'] = getFeatAB(AdFeatTrain)
             
@@ -87,12 +87,12 @@ def trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams, save=False, load=False
         print(" ")
         
         if save:
-            np.savez("log/featParams", **featParams)
-            np.savez("log/nnParams", **nnParams)
-            savePath = saver.save(sess,"./log/model.ckpt")
+            np.savez(logFile+"/featParams", **featParams)
+            np.savez(logFile+"/nnParams", **nnParams)
+            savePath = saver.save(sess,"./"+logFile+"/model.ckpt")
             print("Model saved:", savePath)
         
-def trainE(AdFeat, AdEngy, featParams, nnParams, save=False, load=False):        
+def trainE(AdFeat, AdEngy, featParams, nnParams, save=False, load=False, logFile="log"):
     AdFeatTrain, AdFeatTest, AdEngyTrain, AdEngyTest = train_test_split(
             AdFeat, AdEngy, test_size=0.1)
         
@@ -114,7 +114,7 @@ def trainE(AdFeat, AdEngy, featParams, nnParams, save=False, load=False):
         sess.run(tf.global_variables_initializer())
         
         if load:
-            saver.restore(sess, "./log/model.ckpt")
+            saver.restore(sess, "./"+logFile+"/model.ckpt")
         else:
             featParams['featA'], featParams['featB'] = getFeatAB(AdFeatTrain)
             
@@ -137,19 +137,19 @@ def trainE(AdFeat, AdEngy, featParams, nnParams, save=False, load=False):
         print(" ")
         
         if save:
-            np.savez("log/featParams", **featParams)
-            np.savez("log/nnParams", **nnParams)
-            savePath = saver.save(sess,"./log/model.ckpt")
+            np.savez(logFile+"/featParams", **featParams)
+            np.savez(logFile+"/nnParams", **nnParams)
+            savePath = saver.save(sess,"./"+logFile+"/model.ckpt")
             print("Model saved:", savePath)
             
-def getE(feat, featParams, nnParams):
+def getE(feat, featParams, nnParams,logFile="log"):
     tf_feat = tf.placeholder(tf.float32, (None,featParams['nFeat']))
     L3 = tff.getE(tf_feat, featParams['nFeat'], nnParams)
     
     with tf.Session() as sess:
         saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
         sess.run(tf.global_variables_initializer())
-        saver.restore(sess, "./log/model.ckpt")
+        saver.restore(sess, "./"+logFile+"/model.ckpt")
         
         feedDict = {tf_feat: scaleFeat(featParams, feat)}
         
@@ -157,14 +157,14 @@ def getE(feat, featParams, nnParams):
         
     return engy
 
-def getAd(feat, featParams, nnParams):
+def getAd(feat, featParams, nnParams, logFile="log"):
     tf_feat = tf.placeholder(tf.float32, (None,featParams['nFeat']))
     L4 = tff.getAd(tf_feat, featParams['nFeat'], nnParams)
     
     with tf.Session() as sess:
         saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
         sess.run(tf.global_variables_initializer())
-        saver.restore(sess, "./log/model.ckpt")
+        saver.restore(sess, "./"+logFile+"/model.ckpt")
         
         feedDict = {tf_feat: scaleFeat(featParams, feat)}
         

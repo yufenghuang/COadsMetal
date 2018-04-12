@@ -4,6 +4,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
+import pandas as pd
+
 
 nnParams, featParams = pyu.initParams()
 nnParams['learningRate'] = 0.00001
@@ -27,8 +29,11 @@ for i,file in enumerate(os.listdir(batch1Dir)):
 
 nCase, featCuOCCOH = pyu.getFeatPOSCAR(batch1Dir, featParams)
 
+# df = pd.DataFrame(featCuOCCOH)
+# df.to_csv("CuOCCOH_batch1_feat",header=False,index=False)
 # pyf.trainE(featCuOCCOH, E_CuOCCOH, featParams, nnParams,save=True)
 
+featParams=pyu.loadFeat("log/featParams.npz")
 E_NN = pyf.getE(featCuOCCOH, featParams, nnParams)
 
 plt.figure()
