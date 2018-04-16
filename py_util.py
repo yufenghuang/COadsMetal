@@ -128,16 +128,45 @@ def getSurfVector(R_surfNN, R_M_all, Rnb = 15.0, angleCutoff = 30):
 
     return R_surfNN[idxSurf]
 
-def saveXYZ(R_list, Element_list, fileName):
+def saveXYZ(R_list, Element_list, fileName, comment=""):
     nAtoms = 0
     for R in R_list:
         nAtoms += len(R)
     with open(fileName, 'w') as file:
         file.write(str(nAtoms) + "\n")
-        file.write("\n")
+        file.write(comment+"\n")
         for R, element in zip(R_list, Element_list):
             for i in range(len(R)):
                 file.write(element + " " + str(R[i,0]) + " " + str(R[i,1]) + " " + str(R[i,2]) + "\n")
+
+def savePOSCAR(R_list, Element_list, lattice, fileName, comment="",selectiveDyn=""):
+    with open(fileName, 'w') as file:
+        file.write(str(comment)+"\n")
+        file.write("1.0\n")
+        file.write(" ".join(lattice[0].astype(str))+"\n")
+        file.write(" ".join(lattice[1].astype(str)) + "\n")
+        file.write(" ".join(lattice[2].astype(str)) + "\n")
+        file.write(" ".join(Element_list) + "\n")
+        file.write(" ".join([str(len(x)) for x in R_list])+"\n")
+        if str(selectiveDyn)=="":
+            file.write("Cartesian\n")
+            for R in R_list:
+                for i in range(len(R)):
+                    file.write(" ".join(R[i].astype(str)) + "\n")
+        else:
+            nAtoms = 0
+            for R in R_list:
+                nAtoms += len(R)
+            assert len(selectiveDyn) == nAtoms, \
+                "length of the True & False matrix for selective dynamics doesn't match the number of atoms"
+            file.write("Selective Dynamics\n")
+            file.write("Cartesian\n")
+
+            j = 0
+            for R in R_list:
+                for i in range(len(R)):
+                    file.write(" ".join(R[i].astype(str)) + " " + " ".join(selectiveDyn[j])+"\n" )
+                    j += 1
 
 def getE(poscar):
     with open(poscar,'r') as p:
