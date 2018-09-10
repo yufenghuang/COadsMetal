@@ -195,6 +195,26 @@ def getFeat(nAtoms, coord,n2b,n3b):
     yD = np.sum(getCos(Rl/4-1,n3b)[:,np.newaxis,:,np.newaxis] * yD[:,:,np.newaxis,:],axis=0)
     return np.concatenate([yR, yD.reshape(-1)])
 
+# def getFeat2(coord,n2b,n3b, Router):
+#     nAtoms = len(coord)
+#     Rl = np.sqrt(np.sum(coord**2,axis=-1))
+#     Dc = coord[:,np.newaxis] - coord
+#     Dc = np.sqrt(np.sum(Dc**2,axis=-1))
+#
+#     yR = np.zeros((*Rl.shape, n2b))
+#     yR[Rl>0] = getCos(Rl[Rl>0]/4-1,n2b)
+#     y2b = yR.sum(axis=1)
+#
+#     yR = np.zeros((*Rl.shape, n3b))
+#     yD = np.zeros((*Rl.shape, Rl.shape[1], n3b))
+#     yR[Rl > 0] = getCos(Rl[Rl > 0] / 4 - 1, n3b)
+#     yD[Dc > 0] = getCos(Dc[Dc > 0] / 4 - 1, n3b)
+#     yD = np.sum(yR[:, :, None, :, None] * yD[:, :, :, None, :], axis=1)
+#     yD = np.sum(yR[:, :, None, :, None] * yD[:, :, :, None, :], axis=1)
+#
+#     return np.concatenate([yR, yD.reshape(-1)])
+
+
 def getFeatPOSCAR(poscarDir, featParams):
 
     nPOSCAR = 0
