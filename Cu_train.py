@@ -10,15 +10,15 @@ import py_func as pyf
 
 nnParams, featParams = pyu.initParams()
 
-nnParams["nEpoch"] = 25000
+nnParams["nEpoch"] = 5000
 
 nAd, AdFeat, AdEngy = pyu.getAd("adsorbed", featParams)
 nDe, DeFeat = pyu.getDe("desorbed", featParams)
 
-#pyf.trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams,save=True)
+RMSE_train, RMSE_valid = pyf.trainEL_validation(AdFeat, AdEngy, DeFeat, featParams, nnParams,save=True)
 
-nnParams = pyu.loadNN("log/nnParams.npz")
-featParams = pyu.loadFeat("log/featParams.npz")
-E = pyf.getE(AdFeat, featParams, nnParams)
+# nnParams = pyu.loadNN("log/nnParams.npz")
+# featParams = pyu.loadFeat("log/featParams.npz")
+# E = pyf.getE(AdFeat, featParams, nnParams)
 #
-#pyf.getAd(AdFeat, featParams, nnParams)
+# pyf.getAd(AdFeat, featParams, nnParams)
