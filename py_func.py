@@ -24,20 +24,10 @@ def getFeatAB(feat):
     return featA, featB
 
 
-def trainEL_validation(AdFeat, AdEngy, DeFeat, featParams, nnParams, save=False, load=False, logFile="log"):
-    AdFeatTrain, AdFeatTestValid, AdEngyTrain, AdEngyTestValid = train_test_split(
-        AdFeat, AdEngy, test_size=0.2)
+def trainEL_validation(featSets, engySets, featParams, nnParams, save=False, load=False, logFile="log"):
 
-    DeFeatTrain, DeFeatTestValid, DeLabelTrain, DeLabelTestValid = train_test_split(
-        np.concatenate((AdFeat, DeFeat), axis=0),
-        np.concatenate((np.zeros_like(AdEngy), np.ones(len(DeFeat))), axis=0),
-        test_size=0.2)
-
-    AdFeatValid, AdFeatTest, AdEngyValid, AdEngyTest = train_test_split(
-        AdFeatTestValid, AdEngyTestValid, test_size=0.5)
-
-    DeFeatValid, DeFeatTest, DeLabelValid, DeLabelTest = train_test_split(
-        DeFeatTestValid, DeLabelTestValid, test_size=0.5)
+    AdFeatTrain, AdFeatValid, AdFeatTest, DeFeatTrain, DeFeatValid, DeFeatTest = featSets
+    AdEngyTrain, AdEngyValid, AdEngyTest, DeLabelTrain, DeLabelValid, DeLabelTest = engySets
 
     print("Adsorption - Train:Validation:Test = {}:{}:{}".format(len(AdEngyTrain), len(AdEngyValid), len(AdEngyTest)))
     print("Desorption - Train:Validation:Test = {}:{}:{}".format(len(DeLabelTrain), len(DeLabelValid), len(DeLabelTest)))
@@ -68,6 +58,8 @@ def trainEL_validation(AdFeat, AdEngy, DeFeat, featParams, nnParams, save=False,
             saver.restore(sess, "./" + logFile + "/model.ckpt")
         else:
             featParams['featA'], featParams['featB'] = getFeatAB(AdFeatTrain)
+            savePath = saver.save(sess, "./" + logFile + "/model.ckpt")
+            print("Initial model saved:", savePath)
 
         AdTrainDict = {tf_feat: scaleFeat(featParams, AdFeatTrain), tf_engy: AdEngyTrain,
                        tf_LR: nnParams['learningRate']}
@@ -97,7 +89,7 @@ def trainEL_validation(AdFeat, AdEngy, DeFeat, featParams, nnParams, save=False,
 
                 teLoss = sess.run(engyLoss, feed_dict=AdValidDict)
                 tl4 = sess.run(L4, feed_dict=DeValidDict)
-                tl4 = np.sum(np.array(vl4 > 0.5, dtype=int) != DeLabelValid) / len(DeLabelValid)
+                tl4 = np.sum(np.array(tl4 > 0.5, dtype=int) != DeLabelValid) / len(DeLabelValid)
 
                 print(epoch, eLoss, l4)
                 print(epoch, veLoss, vl4)
@@ -117,7 +109,7 @@ def trainEL_validation(AdFeat, AdEngy, DeFeat, featParams, nnParams, save=False,
 
         teLoss = sess.run(engyLoss, feed_dict=AdValidDict)
         tl4 = sess.run(L4, feed_dict=DeValidDict)
-        tl4 = np.sum(np.array(vl4 > 0.5, dtype=int) != DeLabelValid) / len(DeLabelValid)
+        tl4 = np.sum(np.array(tl4 > 0.5, dtype=int) != DeLabelValid) / len(DeLabelValid)
 
         print(epoch, eLoss, l4)
         print(epoch, veLoss, vl4)
@@ -133,7 +125,67 @@ def trainEL_validation(AdFeat, AdEngy, DeFeat, featParams, nnParams, save=False,
             np.savez(logFile + "/nnParams", **nnParams)
             print("Model saved:", savePath)
 
-    return RMSE_train, RMSE_valid
+        mu = sess.run(tff.getMu())
+        w = [sess.run(tff.getW("layer" + str(l))) for l in range(1, 4)]
+        b = [sess.run(tff.getB("layer" + str(l))) for l in range(1, 4)]
+
+    return RMSE_train, RMSE_valid, mu, w, b
+
+
+def trainEL_getError(featSets, engySets, featParams, nnParams, logFile="log"):
+
+    AdFeatTrain, AdFeatValid, AdFeatTest, DeFeatTrain, DeFeatValid, DeFeatTest = featSets
+    AdEngyTrain, AdEngyValid, AdEngyTest, DeLabelTrain, DeLabelValid, DeLabelTest = engySets
+
+    print("Adsorption - Train:Validation:Test = {}:{}:{}".format(len(AdEngyTrain), len(AdEngyValid), len(AdEngyTest)))
+    print("Desorption - Train:Validation:Test = {}:{}:{}".format(len(DeLabelTrain), len(DeLabelValid), len(DeLabelTest)))
+
+    tf_feat = tf.placeholder(tf.float32, (None, featParams['nFeat']))
+    tf_engy = tf.placeholder(tf.float32, (None))
+    tf_labels = tf.placeholder(tf.float32, (None))
+    tf_LR = tf.placeholder(tf.float32)
+
+    L3 = tff.getE(tf_feat, featParams['nFeat'], nnParams)
+    L4 = tff.getAd(tf_feat, featParams['nFeat'], nnParams)
+
+    engyLoss = tf.reduce_mean((L3 - tf_engy) ** 2)
+    # logitLoss = tf.reduce_mean((L4 - tf_labels) ** 2)
+
+    with tf.Session() as sess:
+        saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
+        sess.run(tf.global_variables_initializer())
+        saver.restore(sess, "./" + logFile + "/model.ckpt")
+
+        AdTrainDict = {tf_feat: scaleFeat(featParams, AdFeatTrain), tf_engy: AdEngyTrain,
+                       tf_LR: nnParams['learningRate']}
+        AdTestDict = {tf_feat: scaleFeat(featParams, AdFeatTest), tf_engy: AdEngyTest,
+                      tf_LR: nnParams['learningRate']}
+        AdValidDict = {tf_feat: scaleFeat(featParams, AdFeatValid), tf_engy: AdEngyValid,
+                       tf_LR: nnParams['learningRate']}
+
+        DeTrainDict = {tf_feat: scaleFeat(featParams, DeFeatTrain), tf_labels: DeLabelTrain,
+                       tf_LR: nnParams['learningRate']}
+        DeTestDict = {tf_feat: scaleFeat(featParams, DeFeatTest), tf_labels: DeLabelTest,
+                      tf_LR: nnParams['learningRate']}
+        DeValidDict = {tf_feat: scaleFeat(featParams, DeFeatValid), tf_labels: DeLabelValid,
+                      tf_LR: nnParams['learningRate']}
+
+        eLoss = sess.run(engyLoss, feed_dict=AdTrainDict)
+        l4 = sess.run(L4, feed_dict=DeTrainDict)
+        l4 = np.sum(np.array(l4 > 0.5, dtype=int) != DeLabelTrain) / len(DeLabelTrain)
+
+        veLoss = sess.run(engyLoss, feed_dict=AdTestDict)
+        vl4 = sess.run(L4, feed_dict=DeTestDict)
+        vl4 = np.sum(np.array(vl4 > 0.5, dtype=int) != DeLabelTest) / len(DeLabelTest)
+
+        teLoss = sess.run(engyLoss, feed_dict=AdValidDict)
+        tl4 = sess.run(L4, feed_dict=DeValidDict)
+        tl4 = np.sum(np.array(tl4 > 0.5, dtype=int) != DeLabelValid) / len(DeLabelValid)
+
+        print("Training set error: ", eLoss, l4)
+        print("Validation set error: ", veLoss, vl4)
+        print("Testing set error: ", teLoss, tl4)
+        print(" ")
 
 
 def trainEL(AdFeat, AdEngy, DeFeat, featParams, nnParams, save=False, load=False, logFile="log"):
