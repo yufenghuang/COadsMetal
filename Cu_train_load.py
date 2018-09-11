@@ -20,7 +20,7 @@ RMSE_valid = RMSEs["RMSE_valid"]
 
 plt.figure()
 start = 0
-stop = 400
+stop = 375
 epochs = np.arange(start, stop)*20
 plt.plot(epochs, np.sqrt(RMSE_train[start:stop]))
 plt.plot(epochs, np.sqrt(RMSE_valid[start:stop]))
@@ -30,8 +30,8 @@ plt.xlabel("Training iteration")
 plt.legend(["Training Set", "Validation Set"])
 # plt.arrow(5000, 0.2, 1500, 0.06, head_width=0.01)
 ax = plt.gca()
-ax.annotate("Training is terminated at the \n 3400th iteration based on \n the minimum of the validation set", xy=(3400, 0.12), xytext=(3400, 0.2),
-            arrowprops=dict(arrowstyle="->"))
+ax.annotate("Training is terminated at \n the 5000th iteration to \n avoid over-training",
+            xy=(5000, 0.12), xytext=(4800, 0.16),arrowprops=dict(arrowstyle="->"))
 plt.savefig("model_training.pdf")
 
 pyf.trainEL_getError(featSets, engySets, featParams, nnParams)

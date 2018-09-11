@@ -44,6 +44,8 @@ with tf.Session() as sess:
 
     # pyu.saveXYZ([coord], ["Cu"], "test.xyz")
 
+Ei = Ei-0.5
+
 idx = np.zeros(len(Ei))
 for k in range(3):
     idx[np.abs(R_surf[:,k]) < 2] = 1
@@ -71,10 +73,29 @@ plt.figure()
 plt.title("Nanoparticle")
 plt.hist(Ei, alpha=0.5, bins=15)
 
+def plt_hist(axis, data, hatch, label, bins=None):
+    if bins is None:
+        bins = int(len(data) ** .5)
+    counts, edges = np.histogram(data, bins=bins)
+    edges = np.repeat(edges, 2)
+    hist = np.hstack((0, np.repeat(counts, 2), 0))
+
+    outline, = axis.plot(edges,hist,linewidth=1.3)
+    axis.fill_between(edges,hist,0,
+                edgecolor=outline.get_color(), hatch = hatch, label=label,
+                facecolor = 'none')  ## < removes facecolor
+    axis.set_ylim(0, None, auto = True)
 
 plt.figure()
-plt.title("Nanoparticle")
-plt.hist(Ei[Emask > 0], alpha=0.5, bins=15)
+plt.title("Cu Nanoparticle")
+# plt.hist(Ei[Emask > 0], alpha=0.5, bins=15)
+plt_hist(plt.gca(), Ei[Emask>0], '/////', label="Rand1", bins=10)
+plt.ylabel("Count")
+plt.xlabel("$E_{CO}$ (eV)")
+plt.ylim(ymin=0, ymax=1800)
+plt.vlines(-1.07, 0, 1800)
+plt.vlines(-0.87, 0, 1800)
+plt.vlines(-0.78, 0, 1800)
 
 
 Ei2 = Ei[Emask>0]
