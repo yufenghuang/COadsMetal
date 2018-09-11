@@ -56,3 +56,17 @@ plt.hist(Ei[idx>0], alpha=0.5)
 plt.figure()
 plt.title("Surface")
 plt.hist(Ei[idx<1], alpha=0.5)
+
+with open("Cu_NP_n096_surf.xyz", "w") as f:
+    f.write("{}\n".format(len(Ei)))
+    f.write(" \n")
+    for i in range(len(Ei)):
+        print(i)
+        f.write("Cu {} {} {} {} \n".format(*R_surf[i], Ei[i]*10))
+
+with open("Cu_NP_n096_engy.xyz", "w") as f:
+    f.write("{}\n".format(len(Ei)))
+    f.write(" \n")
+    for i in range(len(Ei)):
+        print(i)
+        f.write("Cu  {} {} {} \n".format(Ei[i]*10,  Ei[i]*10, Ei[i]*10))
