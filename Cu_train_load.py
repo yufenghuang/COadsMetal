@@ -34,4 +34,40 @@ ax.annotate("Training is terminated at \n the 5000th iteration to \n avoid over-
             xy=(5000, 0.12), xytext=(4800, 0.16),arrowprops=dict(arrowstyle="->"))
 plt.savefig("model_training.pdf")
 
+plt.figure()
+plt.title("Test Set", fontsize=14)
+Ep = pyf.getE(featSets[2], featParams, nnParams)-0.5
+plt.hist(engySets[2]-0.5, range=(-1.4, -0.5), alpha=0.5)
+plt.hist(Ep, alpha=0.5, range=(-1.4, -0.5))
+plt.xlabel("CO adsorption energy (eV)", fontsize=14)
+plt.ylabel("Count", fontsize=14)
+plt.legend(["DFT", "Neural Network"], fontsize=14)
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+plt.savefig("test_hist.pdf")
+
+plt.figure()
+plt.title("Validation Set", fontsize=14)
+Ep = pyf.getE(featSets[1], featParams, nnParams)-0.5
+plt.hist(engySets[1]-0.5, range=(-1.4, -0.5), alpha=0.5)
+plt.hist(Ep, alpha=0.5, range=(-1.4, -0.5))
+plt.xlabel("CO adsorption energy (eV)", fontsize=14)
+plt.ylabel("Count", fontsize=14)
+plt.legend(["DFT", "Neural Network"], fontsize=14)
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+plt.savefig("valid_hist.pdf")
+
+plt.figure()
+plt.title("Training Set", fontsize=14)
+Ep = pyf.getE(featSets[0], featParams, nnParams)-0.5
+plt.hist(engySets[0]-0.5, range=(-1.4, -0.5), alpha=0.5)
+plt.hist(Ep, alpha=0.5, range=(-1.4, -0.5))
+plt.xlabel("CO adsorption energy (eV)", fontsize=14)
+plt.ylabel("Count", fontsize=14)
+plt.legend(["DFT", "Neural Network"], fontsize=14)
+plt.xticks(fontsize=14)
+plt.yticks(fontsize=14)
+plt.savefig("train_hist.pdf")
+
 pyf.trainEL_getError(featSets, engySets, featParams, nnParams)

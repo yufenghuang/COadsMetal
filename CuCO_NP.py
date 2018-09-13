@@ -46,9 +46,11 @@ with tf.Session() as sess:
 
     # pyu.saveXYZ([coord], ["Cu"], "test.xyz")
 
+Ei=Ei-0.5
+
 idx = np.zeros(len(Ei))
 for k in range(3):
-    idx[np.abs(R_surf[:,k]) < 2] = 1
+    idx[np.abs(R_surf[:,k]) < 3] = 1
 
 plt.figure()
 plt.title("Grain Boundary")

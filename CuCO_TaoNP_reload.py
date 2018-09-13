@@ -87,15 +87,20 @@ def plt_hist(axis, data, hatch, label, bins=None):
     axis.set_ylim(0, None, auto = True)
 
 plt.figure()
-plt.title("Cu Nanoparticle")
+plt.title("CO Adsorption Energies on a Copper Nanoparticle \n")
 # plt.hist(Ei[Emask > 0], alpha=0.5, bins=15)
 plt_hist(plt.gca(), Ei[Emask>0], '/////', label="Rand1", bins=10)
 plt.ylabel("Count")
 plt.xlabel("$E_{CO}$ (eV)")
 plt.ylim(ymin=0, ymax=1800)
-plt.vlines(-1.07, 0, 1800)
-plt.vlines(-0.87, 0, 1800)
-plt.vlines(-0.78, 0, 1800)
+plt.vlines(-1.07, 0, 1800, linestyles='--')
+plt.vlines(-0.87, 0, 1800, linestyles='--')
+plt.vlines(-0.78, 0, 1800, linestyles='--')
+plt.text(-1.13, 1820, "Cu(211)")
+plt.text(-0.95, 1820, "Cu(100)")
+plt.text(-0.82, 1820, "Cu(111)")
+plt.savefig("COads_TaoNP.pdf")
+
 
 
 Ei2 = Ei[Emask>0]
