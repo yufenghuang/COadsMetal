@@ -45,6 +45,9 @@ plt.legend(["DFT", "Neural Network"], fontsize=14)
 plt.xticks(fontsize=14)
 plt.yticks(fontsize=14)
 plt.savefig("test_hist.pdf")
+print("Test set (DFT): [{}, {}]".format(np.min(engySets[2])-0.5, np.max(engySets[2])-0.5))
+print("Test set (NN): [{}, {}]".format(np.min(Ep), np.max(Ep)))
+
 
 plt.figure()
 plt.title("Validation Set", fontsize=14)
@@ -57,6 +60,9 @@ plt.legend(["DFT", "Neural Network"], fontsize=14)
 plt.xticks(fontsize=14)
 plt.yticks(fontsize=14)
 plt.savefig("valid_hist.pdf")
+print("Validation set (DFT): [{}, {}]".format(np.min(engySets[1])-0.5, np.max(engySets[1])-0.5))
+print("Validation set (NN): [{}, {}]".format(np.min(Ep), np.max(Ep)))
+
 
 plt.figure()
 plt.title("Training Set", fontsize=14)
@@ -69,5 +75,8 @@ plt.legend(["DFT", "Neural Network"], fontsize=14)
 plt.xticks(fontsize=14)
 plt.yticks(fontsize=14)
 plt.savefig("train_hist.pdf")
+print("Training set (DFT): [{}, {}]".format(np.min(engySets[0])-0.5, np.max(engySets[0])-0.5))
+print("Training set (NN): [{}, {}]".format(np.min(Ep), np.max(Ep)))
+
 
 pyf.trainEL_getError(featSets, engySets, featParams, nnParams)

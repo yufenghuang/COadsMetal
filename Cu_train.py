@@ -15,6 +15,9 @@ nnParams, featParams = pyu.initParams()
 
 nnParams["nEpoch"] = 20000
 
+#nnParams['nL1'] = 30
+#nnParams['nL2'] = 30
+
 nAd, AdFeat, AdEngy = pyu.getAd("adsorbed", featParams)
 nDe, DeFeat = pyu.getDe("desorbed", featParams)
 
